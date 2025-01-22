@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: rgb(238, 166, 166);
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgb(99, 60, 60);
+            font-size: 24px;
+            cursor: pointer;
+            background-color: rgb(35, 32, 32);
+            color: rgb(240, 180, 180);
+            box-shadow:  6px 4px 8px grey;
+        }
+        .cell.taken {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .restart {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: black;
+            color: lightcoral;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <div class="board" id="board"></div>
+    <div class="message" id="message"></div>
+    <button class="restart" id="restart">Restart Game</button>
+
+    <script>
+        const boardElement = document.getElementById('board');
+        const messageElement = document.getElementById('message');
+        const restartButton = document.getElementById('restart');
+
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let isGameOver = false;
+
+        
+        function initializeBoard() {
+            boardElement.innerHTML = '';
+            board.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.classList.add('cell');
+                cellElement.dataset.index = index;
+                cellElement.addEventListener('click', handleCellClick);
+                boardElement.appendChild(cellElement);
+            });
+            updateMessage(`${currentPlayer}'s turn`);
+        }
+
+        function handleCellClick(event) {
+            const index = event.target.dataset.index;
+            if (board[index] || isGameOver) return;
+
+            board[index] = currentPlayer;
+            event.target.textContent = currentPlayer;
+            event.target.classList.add('taken');
+
+            if (checkWin()) {
+                updateMessage(`${currentPlayer} wins!`);
+                isGameOver = true;
+            } else if (board.every(cell => cell)) {
+                updateMessage('It\'s a draw!');
+                isGameOver = true;
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                updateMessage(`${currentPlayer}'s turn`);
+            }
+        }
+
+        function checkWin() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                [0, 4, 8], [2, 4, 6]             
+            ];
+
+            return winningCombinations.some(combination => {
+                const [a, b, c] = combination;
+                return board[a] && board[a] === board[b] && board[a] === board[c];
+            });
+        }
+
+        function updateMessage(message) {
+            messageElement.textContent = message;
+        }
+
+        restartButton.addEventListener('click', () => {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            isGameOver = false;
+            initializeBoard();
+        });
+
+        initializeBoard();
+    </script>
+</body>
+</html>
